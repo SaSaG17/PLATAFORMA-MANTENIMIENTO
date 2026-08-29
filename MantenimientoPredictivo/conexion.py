@@ -14,7 +14,7 @@ class ConexionBaseDatos:
                     host="localhost",
                     database="mantenimiento_predictivo",
                     user="root",
-                    password="admin"  # Cambia por tu contraseña de MySQL si es distinta
+                    password="admin" 
                 )
                 if self.conexion.is_connected():
                     print("¡Conexión Singleton establecida con éxito!")
