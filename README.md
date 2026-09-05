@@ -8,7 +8,7 @@ Este repositorio contiene el diseño e implementación de una Plataforma de Mant
 - Detectar posibles fallas de manera temprana utilizando modelos de Machine Learning.
 - Gestionar las órdenes de trabajo relacionadas con el mantenimiento de los equipos.
 - Controlar la disponibilidad y uso de los repuestos necesarios para las actividades de mantenimiento.
-# ⚙️ Plataforma de Mantenimiento Predictivo Industrial (CMMS)
+# ⚙️ Plataforma de Mantenimiento Predictivo Industrial 
 
 Sistema Web desarrollado en **Flask (Python)** y **MySQL** para la gestión inteligente del mantenimiento industrial. La plataforma integra monitoreo de variables de sensores en tiempo real, control de acceso basado en roles (RBAC) y flujos avanzados automatizados mediante patrones de diseño de software.
 
