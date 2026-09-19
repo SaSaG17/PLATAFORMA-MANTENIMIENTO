@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Orden de Trabajo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5" style="max-width: 600px;">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="mb-3 text-center">⚙️ Nueva Orden de Trabajo</h3>
+                <p class="text-muted text-center small">La fábrica de objetos asignará el SLA y validará la criticidad automáticamente.</p>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Sensor o Equipo Afectado:</label>
+                        <select name="sensor_id" class="form-select" required>
+                            {% for s in sensores %}
+                            <option value="{{ s.id }}">{{ s.nombre_equipo }} (ID: {{ s.id }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Título del Problema:</label>
+                        <input type="text" name="titulo" class="form-control" placeholder="Ej: Sobrecalentamiento en rodamientos" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descripción Detallada:</label>
+                        <textarea name="descripcion" class="form-control" rows="3" placeholder="Instrucciones técnicas..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Técnico Asignado:</label>
+                        <select name="asignado_a" class="form-select" required>
+                            {% for e in empleados %}
+                            <option value="{{ e.id }}">{{ e.nombre }} (Rol: {{ e.rol }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Prioridad de la Falla:</label>
+                        <select name="prioridad" class="form-select" required>
+                            <option value="baja">Baja</option>
+                            <option value="media">Media</option>
+                            <option value="alta">Alta</option>
+                            <option value="critica">Crítica (Dispara protocolo de emergencia)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Generar Orden con Factory Method</button>
+                    <a href="{{ url_for('listar_ordenes') }}" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
