@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Login - Mantenimiento</title></head>
+<body style="font-family:Arial; background:#f4f4f9; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">
+    <div style="background:white; padding:30px; border-radius:8px; box-shadow:0px 0px 10px rgba(0,0,0,0.1); width:300px;">
+        <h2 style="text-align:center;">Iniciar Sesión</h2>
+        {% if error %}<p style="color:red; font-size:14px; text-align:center;">{{ error }}</p>{% endif %}
+        <form method="POST">
+            <label>Correo Electrónico:</label><br><input type="email" name="correo" required style="width:100%; padding:8px; margin-top:5px; box-sizing:border-box;"><br><br>
+            <label>Contraseña:</label><br><input type="password" name="contrasena" required style="width:100%; padding:8px; margin-top:5px; box-sizing:border-box;"><br><br>
+            <button type="submit" style="width:100%; background:#007BFF; color:white; border:none; padding:10px; border-radius:4px; cursor:pointer;">Ingresar</button>
+        </form>
+    </div>
+</body>
+</html>
