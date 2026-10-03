@@ -14,12 +14,6 @@ Sistema Web desarrollado en **Flask (Python)** y **MySQL** para la gestión inte
 
 ---
 
-# 🛠️ Sistema CMMS (Computerized Maintenance Management System)
-
-Plataforma web desarrollada en **Flask (Python)** y **MySQL** para la gestión integral del mantenimiento industrial, estructurada bajo estrictos principios de diseño modular, buenas prácticas de ingeniería de software y patrones de diseño avanzados.
-
----
-
 ## 🚀 Características Principales y Arquitectura
 
 El software está construido integrando los siguientes patrones de diseño y módulos funcionales:
