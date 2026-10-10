@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Empleados - Mantenimiento Predictivo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007BFF; color: white; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .btn-menu { display: inline-block; margin-bottom: 15px; text-decoration: none; background: #6c757d; color: white; padding: 8px 12px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('menu_principal') }}" class="btn-menu">← Volver al Menú Principal</a>
+        
+        <h1>Gestión de Empleados y Roles</h1>
+        <hr>
+
+        {% if mensaje %}
+            <p class="success">{{ mensaje }}</p>
+        {% endif %}
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <h3>Registrar Nuevo Empleado</h3>
+        <form method="POST">
+            <label>Nombre:</label><br>
+            <input type="text" name="nombre" required style="width: 100%; padding: 8px; margin: 5px 0 15px 0;"><br>
+            
+            <label>Correo Electrónico:</label><br>
+            <input type="email" name="correo" required style="width: 100%; padding: 8px; margin: 5px 0 15px 0;"><br>
+            
+            <label>Contraseña:</label><br>
+            <input type="password" name="contrasena" required style="width: 100%; padding: 8px; margin: 5px 0 15px 0;"><br>
+            
+            <label>Rol en el Sistema:</label><br>
+            <select name="rol" required style="width: 100%; padding: 8px; margin: 5px 0 15px 0;">
+                <option value="operario">Operario</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="administrador">Administrador</option>
+            </select><br>
+            
+            <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Guardar Empleado</button>
+        </form>
+
+        <hr style="margin: 30px 0;">
+
+        <h3>Lista de Empleados Registrados</h3>
+       <table>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            {% for u in lista_usuarios %}
+            <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.nombre }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.rol }}</td>
+                <td>{{ u.estado }}</td>
+                <td>
+                    <a href="{{ url_for('editar_usuario', id=u.id) }}" style="background: #17a2b8; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">Editar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

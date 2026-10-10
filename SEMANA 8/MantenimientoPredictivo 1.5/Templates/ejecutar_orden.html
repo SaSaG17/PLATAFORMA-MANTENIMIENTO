@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ejecutar Orden de Trabajo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5" style="max-width: 700px;">
+        <div class="card shadow">
+            <div class="card-body">
+                <h3 class="mb-3 text-center">⚙️ Ejecución de Orden #{{ orden_id }}</h3>
+                <p class="text-muted small text-center">Plantilla generada por Patrón Prototype</p>
+                
+                <div class="alert alert-info">
+                    <strong>Equipo Detectado:</strong> {{ plantilla.tipo_equipo }}<br>
+                    <strong>Tareas Estándar Sugeridas:</strong>
+                    <ul class="mb-0">
+                        {% for tarea in plantilla.tareas_base %}
+                            <li>{{ tarea }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones y Diagnóstico del Técnico:</label>
+                        <textarea name="observaciones" class="form-control" rows="3" placeholder="Describa el trabajo realizado..." required></textarea>
+                    </div>
+                    <hr>
+                    <h5 class="mb-3">📦 Consumo de Repuestos para esta Orden</h5>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Seleccionar Repuesto del Inventario:</label>
+                            <select name="repuesto_id" class="form-select">
+                                <option value="0">-- Ningún repuesto consumido --</option>
+                                {% for r in repuestos %}
+                                    <option value="{{ r.id }}">{{ r.codigo_pieza }} - {{ r.nombre_repuesto }} (Stock Disp: {{ r.stock_actual }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Cantidad Usada:</label>
+                            <input type="number" name="cantidad_usada" class="form-control" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('listar_ordenes_pendientes') }}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">✅ Finalizar Trabajo y Descontar Stock</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

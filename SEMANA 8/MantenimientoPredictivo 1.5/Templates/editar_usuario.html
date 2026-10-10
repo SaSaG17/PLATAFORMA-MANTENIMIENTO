@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Empleado - Mantenimiento Predictivo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        .btn-menu { display: inline-block; margin-bottom: 15px; text-decoration: none; background: #6c757d; color: white; padding: 8px 12px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('gestionar_usuarios') }}" class="btn-menu">← Volver a Gestión</a>
+        
+        <h2>Editar Empleado</h2>
+        <hr>
+        <p><b>Nombre:</b> {{ usuario.nombre }}</p>
+        <p><b>Correo:</b> {{ usuario.email }}</p>
+
+        <form method="POST">
+            <label>Rol en el Sistema:</label><br>
+            <select name="rol" required style="width: 100%; padding: 8px; margin: 5px 0 15px 0;">
+                <option value="operario" {% if usuario.rol == 'operario' %}selected{% endif %}>Operario</option>
+                <option value="mantenimiento" {% if usuario.rol == 'mantenimiento' %}selected{% endif %}>Mantenimiento</option>
+                <option value="administrador" {% if usuario.rol == 'administrador' %}selected{% endif %}>Administrador</option>
+            </select><br>
+
+            <label>Estado del Empleado:</label><br>
+            <select name="estado" required style="width: 100%; padding: 8px; margin: 5px 0 15px 0;">
+                <option value="activo" {% if usuario.estado == 'activo' %}selected{% endif %}>Activo</option>
+                <option value="inactivo" {% if usuario.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+            </select><br>
+            
+            <button type="submit" style="background: #ffc107; color: black; font-weight: bold; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; width: 100%;">Actualizar Cambios</button>
+        </form>
+    </div>
+</body>
+</html>
