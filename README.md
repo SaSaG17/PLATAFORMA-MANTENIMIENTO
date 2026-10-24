@@ -71,18 +71,18 @@ Para robustecer la arquitectura frente a la integración de hardware, notificaci
 CMMS_PROJECT/
 │
 ├── patrones_estructurales/
-│   ├── adapter_sensores.py
-│   ├── bridge_notificaciones.py
-│   ├── composite_activos.py
-│   ├── decorator_ordenes.py
-│   ├── patron_proxy_flyweight_ml.py   # Patrones Proxy & Flyweight + ML
-│   └── facade_cmms.py                 # Patrón Facade
+│   ├── adapter_sensores.py          # Traduce datos de sensores IoT externos al formato estándar del CMMS.
+│   ├── bridge_notificaciones.py     # Desacopla los tipos de alertas críticas de sus canales físicos de envío.
+│   ├── composite_activos.py         # Modela la planta en árbol para calcular costos de activos de forma recursiva.
+│   ├── decorator_ordenes.py         # Agrega sellos de auditoría o certificaciones ISO al vuelo en las órdenes.
+│   ├── patron_proxy_flyweight_ml.py # Optimiza RAM (Flyweight) y controla el acceso al motor de IA con caché (Proxy).
+│   └── facade_cmms.py               # Centraliza y unifica la interacción entre las vistas y los subsistemas.
 │
 ├── templates/
-│   └── informes.html                  # Dashboard de Telemetría y Chart.js
+│   └── informes.html                # Dashboard interactivo con gráficos en tiempo real (Chart.js).
 │
-├── conexion.py                         # Patrón Singleton
-├── patron_factory.py                   # Patrón Factory Method
-├── app.py                              # Archivo principal de rutas (Flask)
-├── requirements.txt                    # Dependencias del proyecto
-└── README.md
+├── conexion.py                      # Implementa instancia única para la conexión persistente a MySQL (Singleton).
+├── patron_factory.py                # Desacopla la creación de órdenes de trabajo y cálculo dinámico de SLA.
+├── app.py                           # Archivo principal de rutas, control de vistas y endpoints de Flask.
+├── requirements.txt                 # Listado de dependencias y librerías del proyecto.
+└── README.md                        # Documentación general y guía técnica de la plataforma.
