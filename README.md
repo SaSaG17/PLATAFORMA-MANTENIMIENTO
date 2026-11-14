@@ -25,26 +25,22 @@ Sistema web desarrollado en **Python (Flask)** y **MySQL**, integrando control d
 - **Machine Learning & Optimización:** Módulos personalizados con gestión de caché y optimización de memoria RAM.
 
 ---
-
 ## 🚀 Características Principales y Patrones de Diseño
-
+ 
 El software está construido integrando los siguientes patrones de diseño y módulos funcionales:
-
+ 
 ### 1. Patrón Singleton (`conexion.py`)
 - **Instancia Única:** Centraliza y gestiona una única conexión persistente a la base de datos MySQL durante todo el ciclo de vida de la aplicación web en Flask.
 - **Optimización:** Evita la saturación de conexiones concurrentes y optimiza el rendimiento general del servidor.
-
 ### 2. Control de Accesso Basado en Roles - RBAC (`/login` y `/usuarios`)
 - **Administrador:** Control absoluto sobre altas, modificaciones de estado laboral y asignación de roles (`administrador`, `mantenimiento`, `operario`).
 - **Personal Técnico/Operativo:** Acceso restringido y enfocado al monitoreo de equipos y actualización de incidencias.
-
 ### 3. Patrón Factory Method (`patron_factory.py` y Módulo de Órdenes de Trabajo)
 - Desacopla la capa de presentación de las reglas de negocio industrial.
 - Calcula de forma dinámica el SLA (*Service Level Agreement*) y los protocolos de notificación según la criticidad de la falla reportada (*Orden Rutinaria* vs. *Orden Crítica*).
-
 ### 4. Patrones Estructurales Clave (`patrones_estructurales/`)
 Para robustecer la arquitectura frente a la integración de hardware, notificaciones, jerarquías de planta, analítica de IA y reportes, se implementaron patrones estructurales avanzados:
-
+ 
 - **Adaptador (`adapter_sensores.py`):**
   - Permite integrar sensores IoT y dispositivos de telemetría externos con estructuras de datos incompatibles, traduciéndolas al formato estándar del CMMS.
   - *Ruta de prueba:* `http://127.0.0.1:5000/probar-adapter`
@@ -55,7 +51,7 @@ Para robustecer la arquitectura frente a la integración de hardware, notificaci
   - Modela la infraestructura de planta en forma de jerarquía de árbol. Trata de forma uniforme a una máquina individual o a una línea de producción completa para calcular costos de mantenimiento de forma recursiva.
   - *Ruta de prueba:* `http://127.0.0.1:5000/probar-composite`
 - **Decorador (`decorator_ordenes.py`):**
-  - Enuelve dinámicamente las órdenes de trabajo base al momento de imprimirlas, agregando elementos especiales al vuelo (sellos de auditoría o certificaciones ISO) sin alterar la base de datos.
+  - Envuelve dinámicamente las órdenes de trabajo base al momento de imprimirlas, agregando elementos especiales al vuelo (sellos de auditoría o certificaciones ISO) sin alterar la base de datos.
   - *Ruta de prueba:* `http://127.0.0.1:5000/probar-decorator/<int:orden_id>`
 - **Proxy (`patron_proxy_flyweight_ml.py`):**
   - Controla el acceso al motor analítico de Machine Learning mediante **Lazy Loading** (carga diferida del modelo pesado) y **Caching** (almacenamiento temporal de predicciones para respuestas instantáneas).
@@ -63,9 +59,25 @@ Para robustecer la arquitectura frente a la integración de hardware, notificaci
   - Optimiza el consumo de memoria RAM separando el estado intrínseco (umbrales y unidades compartidas por tipo de variable) del estado extrínseco (lecturas puntuales de sensores), evitando la duplicación de objetos pesados.
 - **Facade (`facade_cmms.py`):**
   - Centraliza y simplifica la interacción entre las vistas web y los múltiples subsistemas del backend, permitiendo cruzar de forma transparente el estado de los sensores, diagnósticos de IA y órdenes de trabajo activas bajo una interfaz unificada.
-
+### 5. Patrones de Comportamiento Clave (`patrones_comportamiento/`)
+Para gobernar el ciclo de vida de las órdenes de trabajo, reaccionar a sus cambios y generar reportes sobre el inventario, se implementaron patrones de comportamiento, sin alterar la lógica de los patrones ya existentes:
+ 
+- **State (`state_ordenes.py` y `state_usuarios.py`):**
+  - **Orden de trabajo:** modela el ciclo `Pendiente → En Proceso → Completada`. Cada estado define qué acciones permite (asignar, iniciar, cerrar) y `TransicionInvalidaError` bloquea las no permitidas, por ejemplo cerrar dos veces una orden (evita doble descuento de inventario).
+  - **Empleado:** un usuario `inactivo` no puede iniciar sesión ni recibir órdenes.
+  - *Rutas:* `/ordenes/asignar`, `/mis-ordenes` y `/login`
+- **Observer (`observer_eventos_ordenes.py`):**
+  - Un bus de eventos publica `orden_creada`, `orden_asignada` y `orden_completada`, y los observadores suscritos reaccionan sin acoplarse a las rutas: `NotificadorTecnico`, `NotificadorAdmin` (ambos reutilizan el Patrón Puente) y `RegistroAuditoria` (guarda el historial en la tabla `auditoria_ordenes`).
+  - Un observador que falle no interrumpe el flujo principal.
+- **Visitor (`visitor_repuestos.py`):**
+  - Recorre la colección de repuestos aplicando operaciones independientes: `VisitanteValorInventario` (valor del stock × costo) y `VisitanteReposicion` (repuestos en o bajo el mínimo y cantidad sugerida a comprar).
+  - *Ruta:* `http://127.0.0.1:5000/repuestos/reporte` (solo administrador)
+#### Módulos funcionales nuevos
+- **Asignación de Órdenes (`/ordenes/asignar`):** el administrador asigna o reasigna órdenes a empleados activos.
+- **Mis Órdenes de Trabajo (`/mis-ordenes`):** cada empleado ve solo sus órdenes, las inicia y las cierra (reutiliza `/ordenes/ejecutar/<id>` con Prototype y Abstract Factory).
+- **Reporte de Inventario (`/repuestos/reporte`):** valorización y necesidades de reposición.
 ---
-
+ 
 ## 📁 Estructura del Proyecto
 ```text
 CMMS_PROJECT/
@@ -78,11 +90,24 @@ CMMS_PROJECT/
 │   ├── patron_proxy_flyweight_ml.py # Optimiza RAM (Flyweight) y controla el acceso al motor de IA con caché (Proxy).
 │   └── facade_cmms.py               # Centraliza y unifica la interacción entre las vistas y los subsistemas.
 │
+├── patrones_comportamiento/
+│   ├── state_ordenes.py             # Ciclo de vida de la orden (Pendiente, En Proceso, Completada) con transiciones controladas.
+│   ├── state_usuarios.py            # Estado del empleado (activo/inactivo): acceso al sistema y recepción de órdenes.
+│   ├── observer_eventos_ordenes.py  # Bus de eventos con observadores: notificaciones (vía Bridge) y auditoría.
+│   └── visitor_repuestos.py         # Visitantes sobre el inventario: valorización y reposición de repuestos.
+│
 ├── templates/
-│   └── informes.html                # Dashboard interactivo con gráficos en tiempo real (Chart.js).
+│   ├── informes.html                # Dashboard interactivo con gráficos en tiempo real (Chart.js).
+│   ├── asignar_ordenes.html         # Módulo del administrador para asignar/reasignar órdenes de trabajo.
+│   ├── mis_ordenes.html             # Módulo del empleado para ver, iniciar y cerrar sus órdenes.
+│   └── reporte_inventario.html      # Reporte de valor de inventario y reposición (Visitor).
+│
+├── Scripts Generales/
+│   └── Auditoria Ordenes.txt        # Script SQL de la tabla auditoria_ordenes (opcional: el observador la crea sola).
 │
 ├── conexion.py                      # Implementa instancia única para la conexión persistente a MySQL (Singleton).
 ├── patron_factory.py                # Desacopla la creación de órdenes de trabajo y cálculo dinámico de SLA.
 ├── app.py                           # Archivo principal de rutas, control de vistas y endpoints de Flask.
 ├── requirements.txt                 # Listado de dependencias y librerías del proyecto.
 └── README.md                        # Documentación general y guía técnica de la plataforma.
+```
