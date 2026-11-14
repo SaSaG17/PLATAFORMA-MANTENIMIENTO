@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Informes y Analítica Predictiva - CMMS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-light">
+
+<!-- BARRA DE NAVEGACIÓN GLOBAL DE LA APLICACIÓN -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="/">⚙️ CMMS Industrial</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/ordenes">Órdenes de Trabajo</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/repuestos">Inventario / Repuestos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active fw-bold text-info" href="/informes">📊 Informes & IA</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-danger" href="/logout">Cerrar Sesión</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+    <h2 class="mb-4">📊 Dashboard de Telemetría y Diagnóstico Predictivo (ML)</h2>
+
+    <div class="row mb-4">
+        <!-- COMBOBOX DINÁMICO DESDE BASE DE DATOS -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white font-weight-bold">Seleccionar Equipo</div>
+                <div class="card-body">
+                    <label for="selectEquipo" class="form-label">Equipo Industrial (Tabla Sensores):</label>
+                    <select id="selectEquipo" class="form-select" onchange="cargarAnalitica()">
+                        <option value="" disabled selected>Cargando equipos desde BD...</option>
+                    </select>
+                    <button class="btn btn-outline-primary mt-3 w-100" onclick="cargarAnalitica()">Actualizar Diagnóstico</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARJETA DE DIAGNÓSTICO DEL MODELO DE MACHINE LEARNING -->
+        <div class="col-md-8">
+            <div class="card shadow-sm border-info">
+                <div class="card-header bg-info text-white fw-bold">🤖 Resultado Predictivo (Proxy + ML + Flyweight)</div>
+                <div class="card-body" id="contenedorDiagnostico">
+                    <p class="text-muted">Cargando diagnóstico predictivo...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRÁFICAS DE CHART.JS -->
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">Tendencia de Telemetría vs. Umbral Crítico</div>
+                <div class="card-body">
+                    <canvas id="chartTelemetria"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">Probabilidad de Falla Estimada</div>
+                <div class="card-body">
+                    <canvas id="chartProbabilidad"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let chartTelemetriaInstance = null;
+let chartProbabilidadInstance = null;
+
+// Cargar opciones del combobox desde la base de datos MySQL
+function cargarEquiposSensores() {
+    fetch('/api/equipos/sensores')
+        .then(response => response.json())
+        .then(equipos => {
+            const select = document.getElementById('selectEquipo');
+            select.innerHTML = '';
+            
+            if (!equipos || equipos.length === 0) {
+                select.innerHTML = '<option value="">No hay equipos registrados en BD</option>';
+                return;
+            }
+
+            equipos.forEach(equipo => {
+                const option = document.createElement('option');
+                option.value = equipo;
+                option.textContent = equipo;
+                select.appendChild(option);
+            });
+
+            // Cargar por defecto el primer equipo
+            cargarAnalitica();
+        })
+        .catch(error => console.error('Error al cargar equipos:', error));
+}
+
+// Cargar analítica y renderizar gráficos
+function cargarAnalitica() {
+    const equipo = document.getElementById('selectEquipo').value;
+    if (!equipo) return;
+    
+    fetch(`/api/analitica/diagnostico/${encodeURIComponent(equipo)}`)
+        .then(response => response.json())
+        .then(data => {
+            const diag = data.diagnostico_ml;
+            const telem = data.telemetria_historica;
+
+            // 1. Renderizar información en la tarjeta
+            document.getElementById('contenedorDiagnostico').innerHTML = `
+                <h5>Estado ML: <span class="badge ${diag.nivel_alerta === 'Alta' ? 'bg-danger' : (diag.nivel_alerta === 'Media' ? 'bg-warning' : 'bg-success')}">${diag.estado_predictivo}</span></h5>
+                <p><strong>Variable Evaluada:</strong> ${telem.tipo_variable} (${telem.valor_actual})</p>
+                <p><strong>Estado en BD:</strong> <span class="badge bg-secondary">${telem.estado_bd}</span></p>
+                <p><strong>Probabilidad de Falla:</strong> ${diag.probabilidad_falla}%</p>
+                <p><strong>Tiempo Estimado sin Fallas:</strong> ~${diag.tiempo_estimado_falla_horas} horas</p>
+                <small class="text-secondary">Fuente de Respuesta: ${diag.origen}</small>
+            `;
+
+            // 2. Gráfica de Líneas (Telemetría)
+            const ctxLine = document.getElementById('chartTelemetria').getContext('2d');
+            if (chartTelemetriaInstance) chartTelemetriaInstance.destroy();
+
+            const baseVal = telem.valor_actual;
+            chartTelemetriaInstance = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['10:00', '10:05', '10:10', '10:15', '10:20', 'Actual'],
+                    datasets: [
+                        {
+                            label: `Lectura (${telem.tipo_variable})`,
+                            data: [baseVal * 0.85, baseVal * 0.90, baseVal * 0.92, baseVal * 0.95, baseVal * 0.98, baseVal],
+                            borderColor: 'rgb(54, 162, 235)',
+                            fill: false
+                        },
+                        {
+                            label: 'Umbral de Alerta',
+                            data: [85, 85, 85, 85, 85, 85],
+                            borderColor: 'rgb(255, 99, 132)',
+                            borderDash: [5, 5],
+                            fill: false
+                        }
+                    ]
+                }
+            });
+
+            // 3. Gráfica de Dona (Probabilidad de Falla)
+            const ctxDoughnut = document.getElementById('chartProbabilidad').getContext('2d');
+            if (chartProbabilidadInstance) chartProbabilidadInstance.destroy();
+
+            chartProbabilidadInstance = new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Riesgo de Falla', 'Operación Segura'],
+                    datasets: [{
+                        data: [diag.probabilidad_falla, Math.max(0, (100 - diag.probabilidad_falla).toFixed(1))],
+                        backgroundColor: ['rgb(255, 99, 132)', 'rgb(75, 192, 192)']
+                    }]
+                }
+            });
+        });
+}
+
+document.addEventListener('DOMContentLoaded', cargarEquiposSensores);
+</script>
+</body>
+</html>

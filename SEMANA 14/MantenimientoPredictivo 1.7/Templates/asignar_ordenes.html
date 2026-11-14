@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asignación de Órdenes de Trabajo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark px-4">
+        <a class="navbar-brand" href="{{ url_for('menu_principal') }}">⬅ Volver al Menú</a>
+        <span class="text-white">Módulo de Mantenimiento Predictivo</span>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>📌 Asignación de Órdenes de Trabajo</h2>
+            <a href="{{ url_for('crear_orden') }}" class="btn btn-primary">+ Nueva Orden de Trabajo</a>
+        </div>
+
+        {% if mensaje %}
+            <div class="alert alert-success">{{ mensaje }}</div>
+        {% endif %}
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <p class="text-muted">Solo se muestran las órdenes que aún no están completadas. Las órdenes en proceso no pueden reasignarse.</p>
+                <table class="table table-striped align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Sensor / Equipo</th>
+                            <th>Título</th>
+                            <th>Prioridad</th>
+                            <th>SLA (Horas)</th>
+                            <th>Estado</th>
+                            <th>Asignado a</th>
+                            <th>Reasignar a</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ot in ordenes %}
+                        <tr>
+                            <td>#{{ ot.id }}</td>
+                            <td><strong>{{ ot.nombre_equipo }}</strong></td>
+                            <td>{{ ot.titulo }}</td>
+                            <td>
+                                {% if ot.prioridad == 'critica' or ot.prioridad == 'alta' %}
+                                    <span class="badge bg-danger text-uppercase">{{ ot.prioridad }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary text-uppercase">{{ ot.prioridad }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ot.sla_horas }} hrs</td>
+                            <td>
+                                {% if ot.estado == 'en_proceso' %}
+                                    <span class="badge bg-warning text-dark">En Proceso</span>
+                                {% else %}
+                                    <span class="badge bg-info text-dark">Pendiente</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ot.nombre_tecnico }}</td>
+                            <td>
+                                {% if ot.puede_asignarse %}
+                                <form method="POST" class="d-flex gap-2">
+                                    <input type="hidden" name="orden_id" value="{{ ot.id }}">
+                                    <select name="tecnico_id" class="form-select form-select-sm" required>
+                                        <option value="">Seleccionar empleado...</option>
+                                        {% for e in empleados %}
+                                        <option value="{{ e.id }}">{{ e.nombre }} ({{ e.rol }})</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-success">Asignar</button>
+                                </form>
+                                {% else %}
+                                    <span class="text-muted">No disponible</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">No hay órdenes de trabajo por asignar.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

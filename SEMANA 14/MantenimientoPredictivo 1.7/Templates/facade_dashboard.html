@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CMMS - Diagnóstico Inteligente (Facade)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">⚙️ Módulo de Diagnóstico Unificado (Patrón Facade)</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">
+                            Selecciona un sensor registrado para que el <strong>Patrón Facade</strong> cruce de forma automatizada los datos de telemetría y las órdenes de trabajo activas.
+                        </p>
+                        
+                        <form method="POST" class="mb-4">
+                            <div class="mb-3">
+                                <label for="equipo" class="form-label">Seleccionar Sensor / Equipo Existente:</label>
+                                <select class="form-select" id="equipo" name="equipo" required>
+                                    <option value="" disabled selected>-- Elige un sensor de la base de datos --</option>
+                                    {% for s in sensores %}
+                                        <option value="{{ s.nombre_equipo }}">
+                                            {{ s.codigo_sensor }} - {{ s.nombre_equipo }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">🚀 Ejecutar Diagnóstico Integral</button>
+                        </form>
+
+                        {% if resultado %}
+                        <div class="alert {% if resultado.estado_general == 'Operativo / Normal' %}alert-success{% else %}alert-warning{% endif %} mt-3">
+                            <h5 class="alert-heading">Resultado de la Fachada:</h5>
+                            <hr>
+                            <p><strong>Equipo Evaluado:</strong> {{ resultado.equipo }}</p>
+                            <p><strong>Estado General:</strong> <span class="badge bg-dark">{{ resultado.estado_general }}</span></p>
+                            
+                            {% if resultado.sensor_encontrado %}
+                                <p><strong>Estado del Sensor:</strong> {{ resultado.estado_sensor }} (Variable: {{ resultado.tipo_variable }})</p>
+                            {% else %}
+                                <p class="text-danger">⚠️ No se encontró un registro activo para este sensor.</p>
+                            {% endif %}
+
+                            {% if resultado.tiene_ordenes_activas %}
+                                <div class="alert alert-danger mt-2">
+                                    <h6>⚠️ Orden de Trabajo Activa Encontrada:</h6>
+                                    <p class="mb-1"><strong>ID:</strong> #{{ resultado.detalle_orden.id }} - {{ resultado.detalle_orden.titulo }}</p>
+                                    <p class="mb-1"><strong>Prioridad:</strong> {{ resultado.detalle_orden.prioridad }} | <strong>Estado OT:</strong> {{ resultado.detalle_orden.estado }}</p>
+                                    <p class="mb-0"><strong>Descripción:</strong> {{ resultado.detalle_orden.descripcion }}</p>
+                                </div>
+                            {% endif %}
+
+                            <p class="mb-0 mt-3"><strong>Detalle del Sistema:</strong> {{ resultado.mensaje }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="/" class="text-decoration-none">← Volver al Inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
