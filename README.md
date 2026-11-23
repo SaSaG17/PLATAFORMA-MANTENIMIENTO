@@ -83,31 +83,33 @@ Para gobernar el ciclo de vida de las órdenes de trabajo, reaccionar a sus camb
 CMMS_PROJECT/
 │
 ├── patrones_estructurales/
-│   ├── adapter_sensores.py          # Traduce datos de sensores IoT externos al formato estándar del CMMS.
-│   ├── bridge_notificaciones.py     # Desacopla los tipos de alertas críticas de sus canales físicos de envío.
-│   ├── composite_activos.py         # Modela la planta en árbol para calcular costos de activos de forma recursiva.
-│   ├── decorator_ordenes.py         # Agrega sellos de auditoría o certificaciones ISO al vuelo en las órdenes.
-│   ├── patron_proxy_flyweight_ml.py # Optimiza RAM (Flyweight) y controla el acceso al motor de IA con caché (Proxy).
-│   └── facade_cmms.py               # Centraliza y unifica la interacción entre las vistas y los subsistemas.
+│   ├── adapter_sensores.py              # Traduce datos de sensores IoT externos al formato estándar del CMMS.
+│   ├── bridge_notificaciones.py         # Desacopla los tipos de alertas críticas de sus canales físicos de envío.
+│   ├── composite_activos.py             # Modela la planta en árbol para calcular costos de activos de forma recursiva.
+│   ├── decorator_ordenes.py             # Agrega sellos de auditoría o certificaciones ISO al vuelo en las órdenes.
+│   ├── patron_proxy_flyweight_ml.py     # Optimiza RAM (Flyweight) y controla el acceso al motor de IA con caché (Proxy).
+│   └── facade_cmms.py                   # Centraliza y unifica la interacción entre las vistas y los subsistemas.
 │
 ├── patrones_comportamiento/
-│   ├── state_ordenes.py             # Ciclo de vida de la orden (Pendiente, En Proceso, Completada) con transiciones controladas.
-│   ├── state_usuarios.py            # Estado del empleado (activo/inactivo): acceso al sistema y recepción de órdenes.
-│   ├── observer_eventos_ordenes.py  # Bus de eventos con observadores: notificaciones (vía Bridge) y auditoría.
-│   └── visitor_repuestos.py         # Visitantes sobre el inventario: valorización y reposición de repuestos.
+│   ├── state_ordenes.py                 # Ciclo de vida de la orden (Pendiente, En Proceso, Completada) con transiciones controladas.
+│   ├── state_usuarios.py                # Estado del empleado (activo/inactivo): acceso al sistema y recepción de órdenes.
+│   ├── observer_eventos_ordenes.py      # Bus de eventos con observadores: notificaciones (vía Bridge) y auditoría.
+│   ├── visitor_repuestos.py             # Visitantes sobre el inventario: valorización y reposición de repuestos.
+│   └── reportes_strategy_template.py    # Filtros dinámicos (Strategy) y flujo fijo de generación de informes (Template Method).
 │
 ├── templates/
-│   ├── informes.html                # Dashboard interactivo con gráficos en tiempo real (Chart.js).
-│   ├── asignar_ordenes.html         # Módulo del administrador para asignar/reasignar órdenes de trabajo.
-│   ├── mis_ordenes.html             # Módulo del empleado para ver, iniciar y cerrar sus órdenes.
-│   └── reporte_inventario.html      # Reporte de valor de inventario y reposición (Visitor).
+│   ├── informes.html                    # Dashboard interactivo con gráficos en tiempo real (Chart.js).
+│   ├── asignar_ordenes.html             # Módulo del administrador para asignar/reasignar órdenes de trabajo.
+│   ├── mis_ordenes.html                 # Módulo del empleado para ver, iniciar y cerrar sus órdenes.
+│   ├── reporte_inventario.html          # Reporte de valor de inventario y reposición (Visitor).
+│   ├── reporte_empleados.html           # Reporte de gestión de empleados filtrable por cargo con exportación PDF.
+│   └── reporte_ordenes.html             # Reporte de órdenes de trabajo filtrable por empleado, repuesto o equipo con PDF.
 │
 ├── Scripts Generales/
-│   └── Auditoria Ordenes.txt        # Script SQL de la tabla auditoria_ordenes (opcional: el observador la crea sola).
+│   └── Auditoria Ordenes.txt            # Script SQL de la tabla auditoria_ordenes (opcional: el observador la crea sola).
 │
-├── conexion.py                      # Implementa instancia única para la conexión persistente a MySQL (Singleton).
-├── patron_factory.py                # Desacopla la creación de órdenes de trabajo y cálculo dinámico de SLA.
-├── app.py                           # Archivo principal de rutas, control de vistas y endpoints de Flask.
-├── requirements.txt                 # Listado de dependencias y librerías del proyecto.
-└── README.md                        # Documentación general y guía técnica de la plataforma.
-```
+├── conexion.py                          # Implementa instancia única para la conexión persistente a MySQL (Singleton).
+├── patron_factory.py                    # Desacopla la creación de órdenes de trabajo y cálculo dinámico de SLA.
+├── app.py                               # Archivo principal de rutas, control de vistas y endpoints de Flask.
+├── requirements.txt                     # Listado de dependencias y librerías del proyecto.
+└── README.md                            # Documentación general y guía técnica de la plataforma.
