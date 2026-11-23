@@ -1,0 +1,12 @@
+-- Tabla de auditoría del Patrón Observer (RegistroAuditoria).
+-- Opcional: el observador la crea automáticamente la primera vez que se publica un evento.
+USE mantenimiento_predictivo;
+
+CREATE TABLE IF NOT EXISTS auditoria_ordenes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    orden_id INT NOT NULL,
+    evento VARCHAR(30) NOT NULL,
+    usuario_id INT NULL,
+    detalle VARCHAR(255) NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
